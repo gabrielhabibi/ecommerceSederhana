@@ -1,62 +1,71 @@
-@extends('layouts.auth')
-@section('content')
-    <div class="row">
-        <div class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-6 offset-lg-3 col-xl-4 offset-xl-4">
+<x-guest-layout>
+    <style>
+        .reset-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+        .custom-input {
+            border: 2px solid #0d6efd !important;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .custom-btn {
+            background-color: #0d6efd;
+            color: white;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            padding: 12px 40px;
+        }
+        .custom-btn:hover {
+            background-color: #084298;
+        }
+        .text-error { color: red; font-size: 0.9rem; }
+        .text-success { color: green; font-size: 0.9rem; }
+    </style>
 
-            <div class="card card-primary">
-                <div class="card-header">
-                    <h4>Reset Password</h4>
+    <div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg rounded-4 p-4">
+                <div class="card-header bg-white border-0 text-center mb-3">
+                    <h3 class="reset-title">{{ __('auth.reset password') }}</h3>
                 </div>
-
                 <div class="card-body">
-                    <p class="text-muted">Reset your password here</p>
-                    <form method="POST" action="{{ route('password.update') }}">
+                    <p class="text-muted text-center mb-4">{{ __('auth.reset your password here') }}</p>
+
+                    <form method="POST" action="{{ route('password.update') }}" id="resetForm">
                         @csrf
-                        <input type="text" value="{{ $request->token }}" hidden name="token">
-                        <div class="form-group">
-                            <input hidden id="email" type="email"
-                                class="form-control @error('email')
-                                is-invalid
-                            @enderror"
-                                name="email" tabindex="1" value="{{ $request->email }}">
-                            @error('email')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
+                        {{-- Token --}}
+                        <x-text-input type="hidden" name="token" :value="$request->token" />
+                        <x-text-input type="hidden" name="email" :value="$request->email" />
+
+                        {{-- Password --}}
+                        <div class="mt-3 text-start">
+                            <x-input-label for="password" :value="__('auth.password')" class="d-block" />
+                            <x-text-input id="password"
+                                          type="password"
+                                          name="password"
+                                          class="custom-input block mt-1 w-full"
+                                          required />
+                            <div id="passwordError" class="text-error"></div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="password">New Password</label>
-                            <input id="password" type="password"
-                                class="form-control @error('password')
-                                is-invalid
-                            @enderror"
-                                name="password" tabindex="2">
-                            @error('password')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
+                        {{-- Confirm Password --}}
+                        <div class="mt-3 text-start">
+                            <x-input-label for="password_confirmation" :value="__('auth.confirm password')" class="d-block" />
+                            <x-text-input id="password_confirmation"
+                                          type="password"
+                                          name="password_confirmation"
+                                          class="custom-input block mt-1 w-full"
+                                          required />
+                            <div id="confirmError" class="text-error"></div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="password_confirmation" class="d-block">Password Confirmation</label>
-                            <input id="password_confirmation" type="password"
-                                class="form-control @error('password_confirmation')
-                                is-invalid
-                            @enderror"
-                                name="password_confirmation">
-                            @error('password_confirmation')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary btn-lg btn-block" tabindex="4">
-                                Reset Password
+                        {{-- Submit --}}
+                        <div class="mt-4 text-center">
+                            <button type="submit" class="custom-btn">
+                                {{ __('auth.reset password') }}
                             </button>
                         </div>
                     </form>
@@ -64,4 +73,37 @@
             </div>
         </div>
     </div>
-@endsection
+
+    <script>
+        const passwordInput = document.getElementById("password");
+        const confirmInput = document.getElementById("password_confirmation");
+        const passwordError = document.getElementById("passwordError");
+        const confirmError = document.getElementById("confirmError");
+
+        const messages = {
+            emailInvalid: "{{ __('auth.email_invalid') }}",
+            passwordMin: "{{ __('auth.password_min') }}",
+            passwordMax: "{{ __('auth.password_max') }}",
+            passwordMismatch: "{{ __('auth.password_mismatch') }}"
+        };
+
+        passwordInput.addEventListener("input", () => {
+            const val = passwordInput.value;
+            if (val.length < 6) {
+                passwordError.textContent = messages.passwordMin;
+            } else if (val.length > 8) {
+                passwordError.textContent = messages.passwordMax;
+            } else {
+                passwordError.textContent = "";
+            }
+        });
+
+        confirmInput.addEventListener("input", () => {
+            if (confirmInput.value !== passwordInput.value) {
+                confirmError.textContent = messages.passwordMismatch;
+            } else {
+                confirmError.textContent = "";
+            }
+        });
+    </script>
+</x-guest-layout>

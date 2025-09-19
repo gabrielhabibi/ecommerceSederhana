@@ -1,12 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-    <h2 class="mt-3">{{__('categories.edit category')}}</h2>
-    @if (session('error'))
-        <div class="alert alert-danger">
-            {{ session('error') }}
-        </div>
-    @endif
+    <h2 class="mt-3">{{ __('categories.edit') }}</h2>
 
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -18,17 +13,28 @@
         </div>
     @endif
 
-    <form action="" method="POST">
-        @csrf
-        @method('PUT')
-        <div class="form-group">
-            <label for="name">{{__('categories.category name')}}</label>
-            <input type="text" name="name" class="form-control" value="" required>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form action="{{ route('categories.update', $category->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="mb-3">
+                    <label for="categories" class="form-label">{{ __('categories.category_name') }}</label>
+                    <input type="text" name="categories" id="categories"
+                           class="form-control"
+                           value="{{ old('categories', $category->categories) }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">{{ __('categories.description') }}</label>
+                    <textarea name="description" id="description" class="form-control">{{ old('description', $category->description) }}</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    {{ __('categories.update_category') }}
+                </button>
+            </form>
         </div>
-        <div class="form-group">
-            <label for="description">{{__('categories.description')}}</label>
-            <textarea name="description" class="form-control"></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">{{__('categories.update category')}}</button>
-    </form>
+    </div>
 @endsection

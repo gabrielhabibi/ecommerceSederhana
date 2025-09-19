@@ -10,5 +10,7 @@ return [
     'user' => 'Pengguna',
     'total price' => 'Total Harga',
     'created at' => 'Pesanan Dibuat',
-
+    'no recent orders' => 'Belum ada pesanan terbaru.',
+    'date' => 'Tanggal',
+    'total orders' => 'Total Pesanan',
 ];

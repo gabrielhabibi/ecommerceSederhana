@@ -2,13 +2,14 @@
 
 return [
 
+    'dashboard' => 'Dasbor',
     'categories' => 'Kategori',
     'products' => 'Produk',
     'users' => 'Pengguna',
-    'admins' => 'Admin',
+    'admins' => 'Administrator',
     'orders' => 'Pesanan',
-    'roles' => 'Peran',
     'settings' => 'Pengaturan',
+    'roles_permissions' => 'Peran & Izin',
     'logout' => 'Keluar',
 
 ];

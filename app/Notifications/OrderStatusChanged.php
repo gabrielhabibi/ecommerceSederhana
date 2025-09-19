@@ -3,71 +3,44 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\DatabaseMessage;
 
 class OrderStatusChanged extends Notification
 {
     use Queueable;
 
-    public $order;
-    public $pdf;
-    protected $ccEmails;
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct($order, $pdf, $ccEmails = [])
+    protected $order;
+
+    public function __construct($order)
     {
         $this->order = $order;
-        $this->pdf = $pdf;
-        $this->ccEmails = $ccEmails;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database', 'mail'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail($notifiable)
+    public function toMail(object $notifiable): MailMessage
     {
-        $mail = (new MailMessage)
-            ->subject('Order Status '. $this->order->status)
-            ->line('The status of your order has been updated to '. $this->order->status)
-            ->action('View Order', url('/orders/' . $this->order->id))
-            ->line('Thank you for shopping with us!')
-            ->salutation('Admin, Ecommerce')
-            ->attachData($this->pdf, 'invoice_order_' . $this->order->id . '.pdf', [
-                'mime' => 'application/pdf',
-            ]);
-
-        if (!empty($this->ccEmails)) {
-            $mail->cc($this->ccEmails);
-        }
-
-        return $mail;
+        // Gunakan route helper ke halaman detail order
+        return (new MailMessage)
+            ->subject('Update Status Order #' . $this->order->id)
+            ->greeting('Halo ' . $notifiable->name . ',')
+            ->line('Status order Anda telah berubah.')
+            ->line('Order #' . $this->order->id . ' sekarang berstatus: ' . ucfirst($this->order->status))
+            ->action('Lihat Order', route('orders.show', $this->order->id)) // <<< diperbaiki
+            ->line('Terima kasih telah berbelanja di toko kami!');
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(object $notifiable): array
     {
         return [
-            'order_id' => $this->order->id,
-            'status' => $this->order->status,
-            'message' => "Order #{$this->order->id} has been updated to {$this->order->status}.",
+            'order_id'   => $this->order->id,
+            'user_name'  => $this->order->user->name ?? 'Unknown',
+            'new_status' => $this->order->status,
+            'message'    => "Status pesanan #{$this->order->id} diubah menjadi {$this->order->status}"
         ];
     }
 }

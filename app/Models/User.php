@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -18,28 +18,37 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = ['name', 'email', 'password', 'role', 'role_id', 'address', 'phone_number'];
+    protected $fillable = ['name','email','email_verified_at','password','role_id','address','phone_number','new_email','email_verification_token',];
 
     /**
      * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>
      */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password','remember_token'];
 
     /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
      */
-    protected function casts(): array
+    protected $casts = [ // cukup pakai properti, nggak perlu function casts()
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
+    public function role()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    public function cartItems()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'user_id');
     }
 }

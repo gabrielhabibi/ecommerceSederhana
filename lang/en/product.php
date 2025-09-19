@@ -4,7 +4,7 @@ return [
 
     'products' => 'Products',
     'category' => 'Category',
-    'add' => 'Add New Product',
+    'add' => '+ Add New Product',
     'import' => 'Import Product',
     'export' => 'Export Product',
     'name' => 'Name',
@@ -23,4 +23,10 @@ return [
     'nb2' => 'You can add more images. Current images:',
     'delete' => 'Delete',
 
+    // Success & error messages
+    'success_create'   => 'Product successfully created.',
+    'success_update'   => 'Product successfully updated.',
+    'success_delete'   => 'Product successfully deleted.',
+    'success_import'   => 'Products successfully imported.',
+    'error_not_found'  => 'Product not found.',
 ];

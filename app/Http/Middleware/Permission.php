@@ -4,17 +4,30 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-// use Symfony\Component\HttpFoundation\Response;
 
 class Permission
 {
-    public function handle(Request $request, Closure $next, $permission)
+    public function handle(Request $request, Closure $next, $permission = null)
     {
         $user = $request->user();
 
-        if (!$user || !$user->relatedRole || !in_array($permission, $user->relatedRole->permissions ?? [])) {
-            $request->session()->flash('error', 'Unauthorized action.');
-            return redirect()->back();
+        // Kalau belum login
+        if (!$user || !$user->role) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Ambil role dan permission dari DB
+        $role = $user->role;
+        $permissions = $role->permissions ?? [];
+
+        // Super admin → selalu lolos
+        if ($role->role_name === 'super admin') {
+            return $next($request);
+        }
+
+        // Kalau butuh permission spesifik → cek
+        if ($permission && !in_array($permission, $permissions)) {
+            abort(403, 'Unauthorized: no access to ' . $permission);
         }
 
         return $next($request);

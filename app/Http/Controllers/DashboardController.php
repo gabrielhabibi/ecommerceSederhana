@@ -11,6 +11,26 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return view('admin.dashboard');
+        $totalUsers = User::count();
+        $totalProducts = Product::count();
+        $totalOrders = Order::count();
+
+        // Grouping orders per hari (misalnya 7 hari terakhir)
+        $recentOrders = Order::with('user')
+            ->selectRaw('DATE(created_at) as order_date')
+            ->selectRaw('COUNT(id) as total_orders')
+            ->selectRaw('SUM(total_price) as total_amount')
+            ->selectRaw('MAX(created_at) as latest_time') // ambil jam terakhir untuk urutkan
+            ->groupBy('order_date')
+            ->orderByDesc('latest_time')
+            ->take(7)
+            ->get();
+
+        return view('admin.dashboard', compact(
+            'totalUsers',
+            'totalProducts',
+            'totalOrders',
+            'recentOrders'
+        ));
     }
 }

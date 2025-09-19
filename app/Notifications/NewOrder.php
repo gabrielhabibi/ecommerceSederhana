@@ -4,21 +4,22 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class NewOrder extends Notification
 {
     use Queueable;
-    protected $order;
-    protected $ccEmails;
+
+    public $order;
+    protected $status;
+
     /**
      * Create a new notification instance.
      */
-    public function __construct($order, $ccEmails = [])
+    public function __construct($order, $status)
     {
-        $this->order = $order;
-        $this->ccEmails = $ccEmails;
+        $this->order  = $order;
+        $this->status = $status;
     }
 
     /**
@@ -28,26 +29,7 @@ class NewOrder extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
-    }
-
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage
-    {
-        $mail = (new MailMessage)
-            ->subject('New Order Received')
-            ->line('A new order has been placed.')
-            ->action('View Order', url('/orders/' . $this->order->id))
-            ->line('Thank you for using our application!')
-            ->salutation('Admin, Ecommerce');
-
-        if (!empty($this->ccEmails)) {
-            $mail->cc($this->ccEmails);
-        }
-    
-        return $mail;
+        return ['database'];
     }
 
     /**
@@ -55,11 +37,21 @@ class NewOrder extends Notification
      *
      * @return array<string, mixed>
      */
-    public function toArray(object $notifiable): array
+    public function toDatabase($notifiable)
     {
+        $message = match ($this->status) {
+            'success' => "Pesanan #{$this->order->id} dari {$this->order->user->name} telah berhasil dibayar ✅",
+            'failed'  => "Pesanan #{$this->order->id} dari {$this->order->user->name} gagal dibayar ❌",
+            'pending' => "Pesanan #{$this->order->id} dari {$this->order->user->name} menunggu pembayaran ⏳",
+            default   => "Status pesanan #{$this->order->id} diperbarui.",
+        };
+
         return [
-            'message' => 'New order received: Order #' . $this->order->id,
-            'order_id' => $this->order->id,
+            'order_id'  => $this->order->id,
+            'user_name' => $this->order->user->name ?? 'Unknown',
+            'status'    => $this->status,
+            'amount'    => $this->order->total ?? 0,
+            'message'   => "Order baru dari {$this->order->user->name}, status: {$this->status}"
         ];
     }
 }

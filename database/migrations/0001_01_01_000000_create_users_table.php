@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('roles', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('role_name');
             $table->json('permissions')->nullable();
             $table->timestamps();
         });
@@ -22,11 +22,13 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['admin', 'user'])->default('user');
             $table->foreignId('role_id')->nullable()->constrained('roles')->onDelete('set null');
             $table->string('address')->nullable();
             $table->string('phone_number')->nullable();
+            $table->string('new_email')->nullable();
+            $table->string('email_verification_token')->nullable();
             $table->timestamps();
         });
 
@@ -53,7 +55,9 @@ return new class extends Migration
     {
         Schema::dropIfExists('roles');
         Schema::dropIfExists('users');
+        $table->dropColumn('email_verified_at');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::table('users', function (Blueprint $table) {$table->dropColumn(['new_email', 'email_verification_token']);});
     }
 };

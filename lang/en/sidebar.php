@@ -2,13 +2,14 @@
 
 return [
 
+    'dashboard' => 'Dashboard',
     'categories' => 'Categories',
     'products' => 'Products',
     'users' => 'Users',
-    'admins' => 'Admins',
+    'admins' => 'Administrators',
     'orders' => 'Orders',
-    'roles' => 'Roles',
     'settings' => 'Settings',
+    'roles_permissions' => 'Roles & Permission',
     'logout' => 'Logout',
 
 ];

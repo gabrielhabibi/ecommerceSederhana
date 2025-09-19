@@ -4,7 +4,7 @@ return [
 
     'products' => 'Produk',
     'category' => 'Kategori',
-    'add' => 'Tambah Produk',
+    'add' => '+ Tambah Produk',
     'import' => 'Import Produk',
     'export' => 'Export Produk',
     'name' => 'Nama',
@@ -23,4 +23,10 @@ return [
     'nb2' => 'Anda dapat menambahkan lebih banyak gambar. Gambar saat ini:',
     'delete' => 'Hapus',
 
+    // Pesan sukses & error
+    'success_create'   => 'Produk berhasil ditambahkan.',
+    'success_update'   => 'Produk berhasil diperbarui.',
+    'success_delete'   => 'Produk berhasil dihapus.',
+    'success_import'   => 'Produk berhasil diimpor.',
+    'error_not_found'  => 'Produk tidak ditemukan.',
 ];

@@ -1,56 +1,138 @@
-@extends('auth.layout')
-
-@section('content')
-<div class="container">
-    <h2>{{__('auth.register')}}</h2>
-    @if (session('error'))
-        <div class="alert alert-danger">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    @if (session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
-    <form action="{{ route('register') }}" method="POST">
+<x-guest-layout>
+    <!-- Judul -->
+    <h1 class="text-5xl md:text-6xl font-extrabold text-center mb-8 tracking-wide text-blue-600">
+        {{ __('auth.register') }}
+    </h1>
+    <form method="POST" action="{{ route('register') }}" id="registerForm">
         @csrf
-        <div class="form-group">
-            <label for="name">{{__('auth.name')}}</label>
-            <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
+
+        <!-- Name -->
+        <div class="mt-4">
+            <x-input-label for="name" :value="__('auth.name')" class="text-black" />
+            <x-text-input id="name" name="name" type="text" class="block mt-1 w-full" :value="old('name')" required autofocus />
+            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+            <div id="nameError" class="text-red-600 text-sm mt-1"></div>
         </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" name="email" class="form-control" value="{{ old('email') }}" required>
+
+        <!-- Email -->
+        <div class="mt-4">
+            <x-input-label for="email" :value="__('auth.email')" class="text-black" />
+            <x-text-input id="email" type="email" name="email" 
+                class="block mt-1 w-full" :value="old('email')" required />
+            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <div id="emailError" class="text-red-600 text-sm mt-1"></div>
         </div>
-        <div class="form-group">
-            <label for="password">{{__('auth.password')}}</label>
-            <input type="password" name="password" class="form-control" value="{{ old('password') }}" required>
+
+        <!-- Password -->
+        <div class="mt-4">
+            <x-input-label for="password" :value="__('auth.password')" class="text-black" />
+            <x-text-input id="password" name="password" type="password" class="block mt-1 w-full" required />
+            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+            <div id="passwordError" class="text-red-600 text-sm mt-1"></div>
         </div>
-        <div class="form-group">
-            <label for="password_confirmation">{{__('auth.confirm password')}}</label>
-            <input type="password" name="password_confirmation" class="form-control" value="{{ old('password_confirmation') }}" required>
+
+        <!-- Confirm Password -->
+        <div class="mt-4">
+            <x-input-label for="password_confirmation" :value="__('auth.confirm password')" class="text-black" />
+            <x-text-input id="password_confirmation" name="password_confirmation" type="password" class="block mt-1 w-full" required />
+            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+            <div id="confirmPasswordError" class="text-red-600 text-sm mt-1"></div>
         </div>
-        <div class="form-group">
-            <label for="address">{{__('auth.address')}}</label>
-            <input type="text" name="address" class="form-control" value="{{ old('address') }}" required>
+
+        <!-- Address -->
+        <div class="mt-4">
+            <x-input-label for="address" :value="__('auth.address')" class="text-black" />
+            <x-text-input id="address" name="address" type="text" class="block mt-1 w-full" :value="old('address')" required />
+            <x-input-error :messages="$errors->get('address')" class="mt-2" />
+            <div id="addressError" class="text-red-600 text-sm mt-1"></div>
         </div>
-        <div class="form-group">
-            <label for="phone_number">{{__('auth.phone number')}}</label>
-            <input type="number" name="phone_number" class="form-control" value="{{ old('phone_number') }}" required>
+
+        <!-- Phone -->
+        <div class="mt-4">
+            <x-input-label for="phone" :value="__('auth.phone number')" class="text-black" />
+            <x-text-input id="phone" name="phone" type="text" class="block mt-1 w-full" :value="old('phone')" required />
+            <x-input-error :messages="$errors->get('phone')" class="mt-2" />
+            <div id="phoneError" class="text-red-600 text-sm mt-1"></div>
         </div>
-        <button type="submit" class="btn btn-primary mt-3">{{__('auth.register')}}</button>
+
+        <!-- Sudah punya akun -->
+        <div class="mt-4 text-center">
+            <a class="underline text-sm text-black hover:text-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" 
+                href="{{ route('login') }}">
+                {{ __('auth.already have account') }}
+            </a>
+        </div>
+
+        <!-- Register button -->
+        <div class="mt-4 text-center">
+            <x-primary-button class="w-full justify-center">
+                {{ __('auth.register') }}
+            </x-primary-button>
+        </div>
     </form>
-</div>
-@endsection
+    {{-- JS Validation --}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const name = document.getElementById("name");
+            const email = document.getElementById("email");
+            const password = document.getElementById("password");
+            const confirmPassword = document.getElementById("password_confirmation");
+            const address = document.getElementById("address");
+            const phone = document.getElementById("phone");
+
+            const nameError = document.getElementById("nameError");
+            const emailError = document.getElementById("emailError");
+            const passwordError = document.getElementById("passwordError");
+            const confirmPasswordError = document.getElementById("confirmPasswordError");
+            const addressError = document.getElementById("addressError");
+            const phoneError = document.getElementById("phoneError");
+
+            // Name
+            name.addEventListener("input", function () {
+                nameError.textContent = name.value.length < 3 ? "{{ __('auth.name too short') }}" : "";
+            });
+
+            // Email
+            email.addEventListener("input", function () {
+                const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                emailError.textContent = !regex.test(email.value) ? "{{ __('auth.email_invalid') }}" : "";
+            });
+
+            // Password
+            password.addEventListener("input", function () {
+                if (password.value.length < 6) {
+                    passwordError.textContent = "{{ __('auth.password_min') }}";
+                } else if (password.value.length > 8) {
+                    passwordError.textContent = "{{ __('auth.password_max') }}";
+                } else {
+                    passwordError.textContent = "";
+                }
+            });
+
+            // Confirm Password
+            confirmPassword.addEventListener("input", function () {
+                confirmPasswordError.textContent =
+                    confirmPassword.value !== password.value ? "{{ __('auth.password mismatch') }}" : "";
+            });
+
+            // Address
+            address.addEventListener("input", function () {
+                addressError.textContent = address.value.length < 5 ? "{{ __('auth.address too short') }}" : "";
+            });
+
+            // Phone
+            phone.addEventListener("input", function () {
+                const regex = /^[0-9]+$/;
+                if (!regex.test(phone.value)) {
+                    phoneError.textContent = "{{ __('auth.invalid phone') }}";
+                } else if (phone.value.length < 11) {
+                    phoneError.textContent = "{{ __('auth.phone too short') }}";
+                } else if (phone.value.length > 13) {
+                    phoneError.textContent = "{{ __('auth.phone too long') }}";
+                } else {
+                    phoneError.textContent = "";
+                }
+            });
+        });
+    </script>
+</x-guest-layout>
